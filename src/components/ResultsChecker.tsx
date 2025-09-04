@@ -63,6 +63,7 @@ const ResultsChecker = () => {
   const [classLoading, setClassLoading] = useState(false);
   const [classResults, setClassResults] = useState<StudentResult[]>([]);
   const [classSchoolName, setClassSchoolName] = useState("");
+  const [isClassModalOpen, setIsClassModalOpen] = useState(false);
 
   // Individual fetch
   const getResults = async () => {
@@ -98,6 +99,7 @@ const ResultsChecker = () => {
         });
       } else {
         setResult(data);
+        setIsModalOpen(true); // Open modal automatically when results are retrieved
         toast({
           title: "Results Retrieved!",
           description: "Your results have been successfully loaded.",
@@ -166,6 +168,8 @@ const ResultsChecker = () => {
 
       if (results.length > 0) {
         setClassSchoolName(results[0].attendedSchool ?? "");
+        setClassResults(results);
+        setIsClassModalOpen(true); // Open class modal automatically when results are retrieved
         toast({
           title: "Class Results Retrieved!",
           description: `Found results for ${results.length} students.`,
@@ -176,9 +180,8 @@ const ResultsChecker = () => {
           description: "No results found for this class. Double-check school code, level and year.",
           variant: "destructive",
         });
+        setClassResults(results);
       }
-
-      setClassResults(results);
     } catch (err) {
       toast({
         title: "Error",
@@ -427,237 +430,6 @@ const ResultsChecker = () => {
           </CardContent>
         </Card>
 
-        {/* Individual Results Display */}
-        {result && (activeTab === "ADVANCED" || activeTab === "ORDINARY") && (
-          <div className="space-y-6">
-            {/* Success Header */}
-            <Card className={`${result.division === "PASS" ? "bg-gradient-success" : "bg-destructive"} text-white border-0`}>
-              <CardContent className="flex items-center justify-between py-6">
-                <div className="flex items-center gap-3">
-                  <Trophy className="h-8 w-8" />
-                  <div>
-                    <h2 className="text-2xl font-bold">🎉 Congratulations!</h2>
-                    <p className="text-white/90">Your results are now available</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button 
-                    onClick={openResultsPopup}
-                    variant="secondary"
-                    size="sm"
-                    className="bg-white/20 text-white border-white/30 hover:bg-white/30"
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View Details
-                  </Button>
-                  <div className="text-right">
-                    <p className="text-sm text-white/90">Overall Status</p>
-                    <p className="text-xl font-bold">{result.division}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Student Info Cards */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-gradient-card border-0 shadow-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Student Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Name:</span>
-                    <span className="font-medium">{result.studentNames}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Index Number:</span>
-                    <span className="font-medium">{result.studentIndexNumber}</span>
-                  </div>
-                  {result.studentNationalId && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Student ID:</span>
-                      <span className="font-medium">{result.studentNationalId}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Academic Year:</span>
-                    <span className="font-medium">{result.academicYear}</span>
-                  </div>
-                  {result.attendedSchool && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">School:</span>
-                      <span className="font-medium">{result.attendedSchool}</span>
-                    </div>
-                  )}
-                  {(activeTab === "ORDINARY") && result.placedSchoolName && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Placed School:</span>
-                      <span className="font-medium">{result.placedSchoolName}</span>
-                    </div>
-                  )}
-                  {(activeTab === "ORDINARY") && result.placedCombinationName && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Placed Combination:</span>
-                      <span className="font-medium">{result.placedCombinationName}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-card border-0 shadow-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5" />
-                    Performance Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Subjects:</span>
-                    <span className="font-medium">{result.rawMark?.length ?? 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Weighted Percentage:</span>
-                    <span className="font-bold text-success">{result.weightedPercent}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Mention:</span>
-                    <span className="font-bold text-success">{result.division}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Subject Results */}
-            <Card className="bg-gradient-card border-0 shadow-card">
-              <CardHeader>
-                <CardTitle>Subject Level Results</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Subject</TableHead>
-                        <TableHead>Subject Weight</TableHead>
-                        <TableHead>Raw Marks (%)</TableHead>
-                        <TableHead>Letter Grade</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {result.rawMark?.map((subject, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{subject.subject.subjectName}</TableCell>
-                          <TableCell>{subject.subjectWeightedPercent}</TableCell>
-                          <TableCell>{Number(subject.markPercent).toFixed(1)}%</TableCell>
-                          <TableCell>
-                            <Badge className={getGradeColor(subject.letterGrade)}>
-                              {subject.letterGrade}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Class Results Display */}
-        {activeTab === "CLASS" && classResults.length > 0 && (
-          <Card className="bg-gradient-card border-0 shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 justify-between">
-                <div className="flex items-center gap-2">
-                  <School className="h-5 w-5" />
-                  Class Results
-                </div>
-                <Button
-                  onClick={exportClassResultsCSV}
-                  variant="outline"
-                  size="sm"
-                  className="ml-4"
-                >
-                  Export CSV
-                </Button>
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Fetched results for <span className="font-bold">{classResults.length}</span> students.
-                {classSchoolName && <> School: <span className="font-bold">{classSchoolName}</span></>}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full overflow-y-auto border rounded-md" style={{ maxHeight: '70vh' }}>
-                <Table className="w-full">
-                  <TableHeader className="sticky top-0 bg-background z-10">
-                    <TableRow>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[90px] max-w-[90px]">Index No.</TableHead>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] max-w-[120px]">Name</TableHead>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[70px] max-w-[70px]">Weight %</TableHead>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[60px] max-w-[60px]">Div.</TableHead>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[100px] max-w-[100px]">Placed Sch.</TableHead>
-                      <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[100px] max-w-[100px]">Placed Comb.</TableHead>
-                      {classSubjects.map((subject, index) => (
-                        <TableHead 
-                          key={subject} 
-                          className="text-xs sticky top-0 bg-background border-r min-w-[70px] max-w-[70px]"
-                          title={subject}
-                        >
-                          {subject.length > 8 ? `${subject.substring(0, 8)}...` : subject}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {classResults.map((student, index) => (
-                      <TableRow key={index} className="hover:bg-muted/50">
-                        <TableCell className="font-medium text-xs border-r truncate">{student.studentIndexNumber}</TableCell>
-                        <TableCell className="text-xs border-r truncate" title={student.studentNames}>{student.studentNames}</TableCell>
-                        <TableCell className="font-bold text-xs border-r">{student.weightedPercent}%</TableCell>
-                        <TableCell className="border-r">
-                          <Badge className={`text-xs ${student.division === "PASS" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                            {student.division === "PASS" ? "P" : "F"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-xs border-r truncate" title={student.placedSchoolName || "-"}>{student.placedSchoolName ? (student.placedSchoolName.length > 15 ? `${student.placedSchoolName.substring(0, 15)}...` : student.placedSchoolName) : "-"}</TableCell>
-                        <TableCell className="text-xs border-r truncate" title={student.placedCombinationName || "-"}>{student.placedCombinationName ? (student.placedCombinationName.length > 15 ? `${student.placedCombinationName.substring(0, 15)}...` : student.placedCombinationName) : "-"}</TableCell>
-                        {classSubjects.map((subject) => {
-                          const markObj = student?.rawMark?.find((m) => m?.subject?.subjectName === subject);
-                          const mark = typeof markObj?.markPercent === "number" ? `${markObj.markPercent.toFixed(1)}%` : "-";
-                          const grade = markObj?.letterGrade ?? "-";
-                          return (
-                            <TableCell key={subject} className="border-r">
-                              {markObj ? (
-                                <div className="text-center">
-                                  <div className="font-medium text-xs">{mark}</div>
-                                  <Badge className={`${getGradeColor(grade)} text-xs px-1 py-0`}>
-                                    {grade}
-                                  </Badge>
-                                </div>
-                              ) : <span className="text-xs">-</span>}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              <div className="mt-6 p-4 bg-warning/10 border border-warning/20 rounded-lg">
-                <p className="text-sm text-center font-medium text-warning-foreground">
-                  ⚠️ Note: This method only works for <strong>Primary and Ordinary level</strong> students.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Empty State for Class */}
         {activeTab === "CLASS" && classResults.length === 0 && !classLoading && (
           <Card className="bg-muted/20 border-dashed">
@@ -671,7 +443,7 @@ const ResultsChecker = () => {
         )}
       </div>
 
-      {/* Results Modal */}
+      {/* Individual Results Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -809,8 +581,8 @@ const ResultsChecker = () => {
                 <p className="text-sm text-muted-foreground">
                   ⚠️ <strong>This is not an official results checking website.</strong>
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  For takedown contact: leedidier030@gmail.com
+                <p className="text-xs text-muted-foreground mt-1">
+                  Official results are available at: <a href="https://nesa.gov.rw" className="text-primary hover:underline">nesa.gov.rw</a>
                 </p>
               </div>
             </div>
@@ -818,30 +590,115 @@ const ResultsChecker = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-r from-muted to-muted/50 mt-16">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <GraduationCap className="h-6 w-6 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Rwanda Education Results Portal</h3>
+      {/* Class Results Modal */}
+      <Dialog open={isClassModalOpen} onOpenChange={setIsClassModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                <School className="h-6 w-6" />
+                Class Results - {classSchoolName}
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={exportClassResultsCSV}
+                  variant="outline"
+                  size="sm"
+                >
+                  Export CSV
+                </Button>
+                <Button
+                  onClick={() => setIsClassModalOpen(false)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+              </div>
             </div>
-            <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 max-w-2xl mx-auto">
-              <p className="text-sm font-medium text-warning-foreground mb-2">
-                ⚠️ <strong>Important Disclaimer</strong>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                This is not an official results checking website. For takedown contact: <strong>leedidier030@gmail.com</strong>
-              </p>
+            <p className="text-muted-foreground">
+              Showing results for <span className="font-bold">{classResults.length}</span> students
+            </p>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden">
+            <div className="w-full h-[70vh] overflow-auto border rounded-md">
+              <Table className="w-full">
+                <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+                  <TableRow>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[100px] font-semibold">Index No.</TableHead>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[150px] font-semibold">Name</TableHead>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[80px] font-semibold">Weight %</TableHead>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[70px] font-semibold">Division</TableHead>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold">Placed School</TableHead>
+                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold">Placed Combination</TableHead>
+                    {classSubjects.map((subject) => (
+                      <TableHead 
+                        key={subject} 
+                        className="text-xs sticky top-0 bg-background border-r min-w-[90px] font-semibold text-center"
+                        title={subject}
+                      >
+                        {subject.length > 10 ? `${subject.substring(0, 10)}...` : subject}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {classResults.map((student, index) => (
+                    <TableRow key={index} className="hover:bg-muted/50">
+                      <TableCell className="font-medium text-xs border-r">{student.studentIndexNumber}</TableCell>
+                      <TableCell className="text-xs border-r" title={student.studentNames}>
+                        {student.studentNames.length > 20 ? `${student.studentNames.substring(0, 20)}...` : student.studentNames}
+                      </TableCell>
+                      <TableCell className="font-bold text-xs border-r text-center">{student.weightedPercent}%</TableCell>
+                      <TableCell className="border-r text-center">
+                        <Badge className={`text-xs ${student.division === "PASS" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                          {student.division}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs border-r" title={student.placedSchoolName || "-"}>
+                        {student.placedSchoolName ? 
+                          (student.placedSchoolName.length > 15 ? `${student.placedSchoolName.substring(0, 15)}...` : student.placedSchoolName) 
+                          : "-"}
+                      </TableCell>
+                      <TableCell className="text-xs border-r" title={student.placedCombinationName || "-"}>
+                        {student.placedCombinationName ? 
+                          (student.placedCombinationName.length > 15 ? `${student.placedCombinationName.substring(0, 15)}...` : student.placedCombinationName) 
+                          : "-"}
+                      </TableCell>
+                      {classSubjects.map((subject) => {
+                        const markObj = student?.rawMark?.find((m) => m?.subject?.subjectName === subject);
+                        const mark = typeof markObj?.markPercent === "number" ? `${markObj.markPercent.toFixed(1)}%` : "-";
+                        const grade = markObj?.letterGrade ?? "-";
+                        return (
+                          <TableCell key={subject} className="border-r text-center">
+                            {markObj ? (
+                              <div className="text-center">
+                                <div className="font-medium text-xs">{mark}</div>
+                                <Badge className={`${getGradeColor(grade)} text-xs px-1 py-0`}>
+                                  {grade}
+                                </Badge>
+                              </div>
+                            ) : <span className="text-xs">-</span>}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-            <div className="mt-6 pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                © 2024 Rwanda Education Results Portal. Educational purposes only.
+            
+            <div className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+              <p className="text-sm text-center font-medium text-warning-foreground">
+                ⚠️ Note: This method only works for <strong>Primary and Ordinary level</strong> students.
               </p>
             </div>
           </div>
-        </div>
-      </footer>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
