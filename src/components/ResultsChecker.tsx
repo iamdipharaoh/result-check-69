@@ -625,69 +625,65 @@ const ResultsChecker = () => {
           
           <div className="flex-1 overflow-hidden">
             <div className="w-full h-[70vh] overflow-auto border rounded-md">
-              <Table className="w-full">
-                <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
-                  <TableRow>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[100px] font-semibold">Index No.</TableHead>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[150px] font-semibold">Name</TableHead>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[80px] font-semibold">Weight %</TableHead>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[70px] font-semibold">Division</TableHead>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold">Placed School</TableHead>
-                    <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold">Placed Combination</TableHead>
-                    {classSubjects.map((subject) => (
-                      <TableHead 
-                        key={subject} 
-                        className="text-xs sticky top-0 bg-background border-r min-w-[90px] font-semibold text-center"
-                        title={subject}
-                      >
-                        {subject.length > 10 ? `${subject.substring(0, 10)}...` : subject}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {classResults.map((student, index) => (
-                    <TableRow key={index} className="hover:bg-muted/50">
-                      <TableCell className="font-medium text-xs border-r">{student.studentIndexNumber}</TableCell>
-                      <TableCell className="text-xs border-r" title={student.studentNames}>
-                        {student.studentNames.length > 20 ? `${student.studentNames.substring(0, 20)}...` : student.studentNames}
-                      </TableCell>
-                      <TableCell className="font-bold text-xs border-r text-center">{student.weightedPercent}%</TableCell>
-                      <TableCell className="border-r text-center">
-                        <Badge className={`text-xs ${student.division === "PASS" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                          {student.division}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs border-r" title={student.placedSchoolName || "-"}>
-                        {student.placedSchoolName ? 
-                          (student.placedSchoolName.length > 15 ? `${student.placedSchoolName.substring(0, 15)}...` : student.placedSchoolName) 
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-xs border-r" title={student.placedCombinationName || "-"}>
-                        {student.placedCombinationName ? 
-                          (student.placedCombinationName.length > 15 ? `${student.placedCombinationName.substring(0, 15)}...` : student.placedCombinationName) 
-                          : "-"}
-                      </TableCell>
-                      {classSubjects.map((subject) => {
-                        const markObj = student?.rawMark?.find((m) => m?.subject?.subjectName === subject);
-                        const mark = typeof markObj?.markPercent === "number" ? `${markObj.markPercent.toFixed(1)}%` : "-";
-                        const grade = markObj?.letterGrade ?? "-";
-                        return (
-                          <TableCell key={subject} className="border-r text-center">
-                            {markObj ? (
-                              <div className="text-center">
-                                <div className="font-medium text-xs">{mark}</div>
-                                <Badge className={`${getGradeColor(grade)} text-xs px-1 py-0`}>
-                                  {grade}
-                                </Badge>
-                              </div>
-                            ) : <span className="text-xs">-</span>}
+                  <Table className="w-full">
+                    <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+                      <TableRow>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[100px] font-semibold break-words">Index No.</TableHead>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[150px] font-semibold break-words">Name</TableHead>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[80px] font-semibold break-words">Weight %</TableHead>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[70px] font-semibold break-words">Division</TableHead>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold break-words">Placed School</TableHead>
+                        <TableHead className="text-xs sticky top-0 bg-background border-r min-w-[120px] font-semibold break-words">Placed Combination</TableHead>
+                        {classSubjects.map((subject) => (
+                          <TableHead 
+                            key={subject} 
+                            className="text-xs sticky top-0 bg-background border-r min-w-[90px] font-semibold text-center break-words whitespace-normal"
+                            title={subject}
+                          >
+                            {subject}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {classResults.map((student, index) => (
+                        <TableRow key={index} className="hover:bg-muted/50">
+                          <TableCell className="font-medium text-xs border-r break-words whitespace-normal">{student.studentIndexNumber}</TableCell>
+                          <TableCell className="text-xs border-r break-words whitespace-normal" title={student.studentNames}>
+                            {student.studentNames}
                           </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableBody>
+                          <TableCell className="font-bold text-xs border-r text-center break-words whitespace-normal">{student.weightedPercent}%</TableCell>
+                          <TableCell className="border-r text-center break-words whitespace-normal">
+                            <Badge className={`text-xs ${student.division === "PASS" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                              {student.division}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs border-r break-words whitespace-normal" title={student.placedSchoolName || "-"}>
+                            {student.placedSchoolName || "-"}
+                          </TableCell>
+                          <TableCell className="text-xs border-r break-words whitespace-normal" title={student.placedCombinationName || "-"}>
+                            {student.placedCombinationName || "-"}
+                          </TableCell>
+                          {classSubjects.map((subject) => {
+                            const markObj = student?.rawMark?.find((m) => m?.subject?.subjectName === subject);
+                            const mark = typeof markObj?.markPercent === "number" ? `${markObj.markPercent.toFixed(1)}%` : "-";
+                            const grade = markObj?.letterGrade ?? "-";
+                            return (
+                              <TableCell key={subject} className="border-r text-center break-words whitespace-normal">
+                                {markObj ? (
+                                  <div className="text-center">
+                                    <div className="font-medium text-xs">{mark}</div>
+                                    <Badge className={`${getGradeColor(grade)} text-xs px-1 py-0`}>
+                                      {grade}
+                                    </Badge>
+                                  </div>
+                                ) : <span className="text-xs">-</span>}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      ))}
+                    </TableBody>
               </Table>
             </div>
             
